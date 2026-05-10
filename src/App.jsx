@@ -138,12 +138,12 @@ export default function App() {
         padding: "3rem",
       }}>
         <div style={{ textAlign: "left" }}>
-          <p style={{ color: "#888", fontSize: "11px", letterSpacing: "0.15em", textTransform: "uppercase", margin: 0 }}>
+          <p style={{ color: "#888", fontSize: "11px", letterSpacing: "0.15em", textTransform: "uppercase", margin: 0, lineHeight: 1 }}>
             {index + 1} / {MODELS.length}
           </p>
           <h1 style={{
             color: model.color, fontSize: "clamp(2rem, 5vw, 4rem)",
-            fontWeight: 900, margin: "0.25rem 0 0",
+            fontWeight: 900, margin: "0", lineHeight: 1,
             fontFamily: "'Playfair Display', serif", transition: "color 0.4s",
           }}>
             {model.label}
