@@ -24,25 +24,52 @@ export default function App() {
   return (
     <div style={{ width: "100vw", height: "100vh", position: "relative", background: "#000" }}>
 
+      {/* Layer 1: artist counter + name — behind the 3D canvas */}
       <div style={{
-        position: "absolute", inset: 0, zIndex: 10,
-        pointerEvents: "none", display: "flex",
-        flexDirection: "column", justifyContent: "space-between",
-        padding: "3rem",
+        position: "absolute", inset: 0, zIndex: 1,
+        pointerEvents: "none", padding: "3rem",
       }}>
         <div style={{ textAlign: "left" }}>
           <p style={{ color: "#888", fontSize: "11px", letterSpacing: "0.15em", textTransform: "uppercase", margin: 0, lineHeight: 1 }}>
             {index + 1} / {MODELS.length}
           </p>
           <h1 style={{
-            color: model.color, fontSize: "clamp(2rem, 5vw, 4rem)",
-            fontWeight: 900, margin: "0", lineHeight: 1,
+            color: model.color, fontSize: "clamp(4rem, 9vw, 8rem)",
+            fontWeight: 900, margin: "0", lineHeight: 0.95,
             fontFamily: "'Playfair Display', serif", transition: "color 0.4s",
           }}>
-            {model.label}
+            {model.label.split(" ").map((word, i) => (
+              <span key={i} style={{ display: "block" }}>{word}</span>
+            ))}
           </h1>
         </div>
+      </div>
 
+      {/* Layer 2: transparent 3D canvas — model appears in front of name */}
+      <Canvas
+        style={{ position: "absolute", inset: 0, zIndex: 5 }}
+        camera={{ position: [0, 0, 4], fov: 50 }}
+        gl={{ alpha: true }}
+        onCreated={({ gl }) => gl.setClearColor(0, 0, 0, 0)}
+      >
+        <ambientLight intensity={0.6} />
+        <pointLight position={[10, 10, 10]} intensity={1.2} />
+        <ScrollInterceptor onScroll={handleScroll} />
+        <Suspense fallback={null}>
+          <Model key={model.path} path={model.path} />
+        </Suspense>
+        <Visualizer playing={playing} />
+        <OrbitControls enableZoom={false} enablePan={false} enableDamping dampingFactor={0.05} />
+        <SceneFilter />
+      </Canvas>
+
+      {/* Layer 3: description, media player, nav dots — above canvas */}
+      <div style={{
+        position: "absolute", inset: 0, zIndex: 10,
+        pointerEvents: "none", display: "flex",
+        flexDirection: "column", justifyContent: "flex-end",
+        padding: "3rem",
+      }}>
         <div style={{ display: "flex", justifyContent: "space-between", alignItems: "flex-end", gap: "2rem" }}>
           <div style={{ textAlign: "left" }}>
             <p style={{ color: "#ccc", maxWidth: "380px", fontSize: "1rem", lineHeight: 1.6, margin: 0, fontFamily: "'Libre Baskerville', serif" }}>
@@ -73,17 +100,6 @@ export default function App() {
         </div>
       </div>
 
-      <Canvas camera={{ position: [0, 0, 4], fov: 50 }}>
-        <ambientLight intensity={0.6} />
-        <pointLight position={[10, 10, 10]} intensity={1.2} />
-        <ScrollInterceptor onScroll={handleScroll} />
-        <Suspense fallback={null}>
-          <Model key={model.path} path={model.path} />
-        </Suspense>
-        <Visualizer playing={playing} />
-        <OrbitControls enableZoom={false} enablePan={false} enableDamping dampingFactor={0.05} />
-        <SceneFilter />
-      </Canvas>
       <LogoViewer />
     </div>
   );
