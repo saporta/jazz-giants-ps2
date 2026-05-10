@@ -3,19 +3,25 @@ import { useState, useRef, useEffect, Suspense, useCallback } from "react";
 import { OrbitControls } from "@react-three/drei";
 import { Model, ScrollInterceptor } from "./Model";
 import { SceneFilter } from "./SceneFilter";
+import { Visualizer } from "./Visualizer";
 import { MODELS } from "./artists";
 import { useDeezerSongs } from "./useDeezerSongs";
 
-function MediaPlayer({ model, color }) {
+function MediaPlayer({ model, color, onPlayingChange }) {
   const [songIndex, setSongIndex] = useState(0);
   const [playing, setPlaying] = useState(false);
   const audioRef = useRef(null);
   const { songs, loading } = useDeezerSongs(model.label, model.tracks);
   const song = songs[songIndex];
 
+  const setAndNotify = useCallback((val) => {
+    setPlaying(val);
+    onPlayingChange(val);
+  }, [onPlayingChange]);
+
   useEffect(() => {
     setSongIndex(0);
-    setPlaying(false);
+    setAndNotify(false);
   }, [model]);
 
   useEffect(() => {
@@ -23,29 +29,29 @@ function MediaPlayer({ model, color }) {
     if (!audio || !song?.preview) return;
     audio.src = song.preview;
     audio.load();
-    if (playing) audio.play().catch(() => setPlaying(false));
+    if (playing) audio.play().catch(() => setAndNotify(false));
   }, [song]);
 
   useEffect(() => {
     const audio = audioRef.current;
     if (!audio) return;
-    if (playing) audio.play().catch(() => setPlaying(false));
+    if (playing) audio.play().catch(() => setAndNotify(false));
     else audio.pause();
   }, [playing]);
 
   useEffect(() => {
-    if (!loading && songs[0]?.preview) setPlaying(true);
+    if (!loading && songs[0]?.preview) setAndNotify(true);
   }, [loading]);
 
   const skip = useCallback(() => {
     setSongIndex((i) => (i + 1) % model.tracks.length);
-    setPlaying(true);
-  }, [model]);
+    setAndNotify(true);
+  }, [model, setAndNotify]);
 
   const prev = useCallback(() => {
     setSongIndex((i) => (i - 1 + model.tracks.length) % model.tracks.length);
-    setPlaying(true);
-  }, [model]);
+    setAndNotify(true);
+  }, [model, setAndNotify]);
 
   return (
     <div style={{
@@ -74,7 +80,7 @@ function MediaPlayer({ model, color }) {
         {model.tracks.map((_, i) => (
           <button
             key={i}
-            onClick={() => { setSongIndex(i); setPlaying(true); }}
+            onClick={() => { setSongIndex(i); setAndNotify(true); }}
             style={{
               flex: 1, height: 2, borderRadius: 1,
               background: i === songIndex ? color : "#333",
@@ -86,18 +92,11 @@ function MediaPlayer({ model, color }) {
       </div>
 
       <div style={{ display: "flex", gap: 12, alignItems: "center", justifyContent: "center" }}>
-        <button
-          onClick={prev}
-          style={{
-            background: "none", border: "none",
-            color: "#555", fontSize: 13,
-            cursor: "pointer", padding: 0, lineHeight: 1,
-          }}
-        >
+        <button onClick={prev} style={{ background: "none", border: "none", color: "#555", fontSize: 13, cursor: "pointer", padding: 0, lineHeight: 1 }}>
           ⏮
         </button>
         <button
-          onClick={() => setPlaying((p) => !p)}
+          onClick={() => setAndNotify(!playing)}
           disabled={!song?.preview}
           style={{
             background: "none", border: "none",
@@ -108,14 +107,7 @@ function MediaPlayer({ model, color }) {
         >
           {playing ? "■" : "▶"}
         </button>
-        <button
-          onClick={skip}
-          style={{
-            background: "none", border: "none",
-            color: "#555", fontSize: 13,
-            cursor: "pointer", padding: 0, lineHeight: 1,
-          }}
-        >
+        <button onClick={skip} style={{ background: "none", border: "none", color: "#555", fontSize: 13, cursor: "pointer", padding: 0, lineHeight: 1 }}>
           ⏭
         </button>
       </div>
@@ -125,6 +117,7 @@ function MediaPlayer({ model, color }) {
 
 export default function App() {
   const [index, setIndex] = useState(0);
+  const [playing, setPlaying] = useState(false);
   const model = MODELS[index];
 
   const handleScroll = (deltaY) => {
@@ -150,8 +143,8 @@ export default function App() {
           </p>
           <h1 style={{
             color: model.color, fontSize: "clamp(2rem, 5vw, 4rem)",
-            fontWeight: 700, margin: "0.25rem 0 0",
-            fontFamily: "Georgia, serif", transition: "color 0.4s",
+            fontWeight: 900, margin: "0.25rem 0 0",
+            fontFamily: "'Playfair Display', serif", transition: "color 0.4s",
           }}>
             {model.label}
           </h1>
@@ -159,10 +152,7 @@ export default function App() {
 
         <div style={{ display: "flex", justifyContent: "space-between", alignItems: "flex-end", gap: "2rem" }}>
           <div style={{ textAlign: "left" }}>
-            <p style={{
-              color: "#ccc", maxWidth: "380px", fontSize: "1rem",
-              lineHeight: 1.6, margin: 0,
-            }}>
+            <p style={{ color: "#ccc", maxWidth: "380px", fontSize: "1rem", lineHeight: 1.6, margin: 0, fontFamily: "'Libre Baskerville', serif" }}>
               {model.description}
             </p>
             <p style={{ color: "#555", fontSize: "11px", letterSpacing: "0.1em", margin: "0.75rem 0 0" }}>
@@ -170,7 +160,7 @@ export default function App() {
             </p>
           </div>
 
-          <MediaPlayer model={model} color={model.color} />
+          <MediaPlayer model={model} color={model.color} onPlayingChange={setPlaying} />
         </div>
 
         <div style={{
@@ -197,12 +187,8 @@ export default function App() {
         <Suspense fallback={null}>
           <Model key={model.path} path={model.path} />
         </Suspense>
-        <OrbitControls
-          enableZoom={false}
-          enablePan={false}
-          enableDamping
-          dampingFactor={0.05}
-        />
+        <Visualizer playing={playing} />
+        <OrbitControls enableZoom={false} enablePan={false} enableDamping dampingFactor={0.05} />
         <SceneFilter />
       </Canvas>
     </div>
