@@ -129,7 +129,7 @@ export default function App() {
   };
 
   return (
-    <div style={{ width: "100vw", height: "100vh", position: "relative", background: "#0a0a0a" }}>
+    <div style={{ width: "100vw", height: "100vh", position: "relative", background: "#000" }}>
 
       <div style={{
         position: "absolute", inset: 0, zIndex: 10,
