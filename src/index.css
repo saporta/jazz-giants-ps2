@@ -1,3 +1,8 @@
+@keyframes marquee {
+  0%, 10%  { transform: translateX(0); }
+  90%, 100% { transform: translateX(-50%); }
+}
+
 *, *::before, *::after {
   box-sizing: border-box;
   margin: 0;

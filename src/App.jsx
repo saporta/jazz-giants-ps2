@@ -1,119 +1,12 @@
 import { Canvas } from "@react-three/fiber";
-import { useState, useRef, useEffect, Suspense, useCallback } from "react";
+import { useState, useRef, Suspense } from "react";
 import { OrbitControls } from "@react-three/drei";
 import { Model, ScrollInterceptor } from "./Model";
 import { SceneFilter } from "./SceneFilter";
 import { Visualizer } from "./Visualizer";
 import { MODELS } from "./artists";
-import { useDeezerSongs } from "./useDeezerSongs";
-
-function MediaPlayer({ model, color, onPlayingChange }) {
-  const [songIndex, setSongIndex] = useState(0);
-  const [playing, setPlaying] = useState(false);
-  const audioRef = useRef(null);
-  const { songs, loading } = useDeezerSongs(model.label, model.tracks);
-  const song = songs[songIndex];
-
-  const setAndNotify = useCallback((val) => {
-    setPlaying(val);
-    onPlayingChange(val);
-  }, [onPlayingChange]);
-
-  useEffect(() => {
-    setSongIndex(0);
-    setAndNotify(false);
-  }, [model]);
-
-  useEffect(() => {
-    const audio = audioRef.current;
-    if (!audio || !song?.preview) return;
-    audio.src = song.preview;
-    audio.load();
-    if (playing) audio.play().catch(() => setAndNotify(false));
-  }, [song]);
-
-  useEffect(() => {
-    const audio = audioRef.current;
-    if (!audio) return;
-    if (playing) audio.play().catch(() => setAndNotify(false));
-    else audio.pause();
-  }, [playing]);
-
-  useEffect(() => {
-    if (!loading && songs[0]?.preview) setAndNotify(true);
-  }, [loading]);
-
-  const skip = useCallback(() => {
-    setSongIndex((i) => (i + 1) % model.tracks.length);
-    setAndNotify(true);
-  }, [model, setAndNotify]);
-
-  const prev = useCallback(() => {
-    setSongIndex((i) => (i - 1 + model.tracks.length) % model.tracks.length);
-    setAndNotify(true);
-  }, [model, setAndNotify]);
-
-  return (
-    <div style={{
-      pointerEvents: "all",
-      width: 220,
-      background: "rgba(10,10,10,0.7)",
-      border: "1px solid #222",
-      borderRadius: 8,
-      padding: "10px 14px",
-      backdropFilter: "blur(12px)",
-    }}>
-      <audio ref={audioRef} onEnded={skip} />
-
-      <p style={{
-        margin: "0 0 8px",
-        color: loading ? "#444" : "#ccc",
-        fontSize: 12,
-        whiteSpace: "nowrap",
-        overflow: "hidden",
-        textOverflow: "ellipsis",
-      }}>
-        {loading ? "loading…" : "Now playing: " + (song?.title ?? model.tracks[songIndex])}
-      </p>
-
-      <div style={{ display: "flex", gap: 5, marginBottom: 10 }}>
-        {model.tracks.map((_, i) => (
-          <button
-            key={i}
-            onClick={() => { setSongIndex(i); setAndNotify(true); }}
-            style={{
-              flex: 1, height: 2, borderRadius: 1,
-              background: i === songIndex ? color : "#333",
-              border: "none", cursor: "pointer", padding: 0,
-              transition: "background 0.2s",
-            }}
-          />
-        ))}
-      </div>
-
-      <div style={{ display: "flex", gap: 12, alignItems: "center", justifyContent: "center" }}>
-        <button onClick={prev} style={{ background: "none", border: "none", color: "#555", fontSize: 13, cursor: "pointer", padding: 0, lineHeight: 1 }}>
-          ⏮
-        </button>
-        <button
-          onClick={() => setAndNotify(!playing)}
-          disabled={!song?.preview}
-          style={{
-            background: "none", border: "none",
-            color: song?.preview ? color : "#444",
-            fontSize: 16, cursor: song?.preview ? "pointer" : "default",
-            padding: 0, lineHeight: 1,
-          }}
-        >
-          {playing ? "■" : "▶"}
-        </button>
-        <button onClick={skip} style={{ background: "none", border: "none", color: "#555", fontSize: 13, cursor: "pointer", padding: 0, lineHeight: 1 }}>
-          ⏭
-        </button>
-      </div>
-    </div>
-  );
-}
+import { LogoViewer } from "./LogoViewer";
+import { MediaPlayer } from "./MediaPlayer";
 
 export default function App() {
   const [index, setIndex] = useState(0);
@@ -191,6 +84,7 @@ export default function App() {
         <OrbitControls enableZoom={false} enablePan={false} enableDamping dampingFactor={0.05} />
         <SceneFilter />
       </Canvas>
+      <LogoViewer />
     </div>
   );
 }
