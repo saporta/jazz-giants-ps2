@@ -81,7 +81,6 @@ export function MediaPlayer({ model, color, onPlayingChange }) {
       pointerEvents: "all",
       width: 220,
       background: "rgba(10,10,10,0.7)",
-      border: "1px solid #222",
       borderRadius: 8,
       padding: "10px 14px",
       backdropFilter: "blur(12px)",
@@ -90,7 +89,7 @@ export function MediaPlayer({ model, color, onPlayingChange }) {
 
       <MarqueeText
         text={loading ? "loading…" : "Now playing: " + (song?.title ?? model.tracks[songIndex])}
-        style={{ margin: "0 0 8px", color: loading ? "#444" : "#ccc", fontSize: 12 }}
+        style={{ margin: "0 0 8px", color: loading ? "#444" : "#ccc", fontSize: 12, fontFamily: "'Lexend Deca', sans-serif", fontWeight: 100 }}
       />
 
       <div style={{ display: "flex", gap: 5, marginBottom: 10 }}>

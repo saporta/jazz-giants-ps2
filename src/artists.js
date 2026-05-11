@@ -4,7 +4,7 @@ export const MODELS = [
   {
     path: `${base}coltrane.glb`,
     label: "John Coltrane",
-    description: "A relentless seeker who pushed the saxophone into spiritual territory — from hard bop to the free cosmos of A Love Supreme.",
+    description: "The relentless seeker. Coltrane pushed the saxophone past its limits and into something closer to prayer — from the velocity of Giant Steps to the transcendence of A Love Supreme. No one in jazz searched harder, or went further.",
     color: "#ffab7b",
     tracks: ["A Love Supreme Acknowledgement", "Giant Steps", "Good Bait"],
   },
