@@ -30,7 +30,7 @@ function MarqueeText({ text, style }) {
   );
 }
 
-export function MediaPlayer({ model, color, onPlayingChange }) {
+export function MediaPlayer({ model, color, onPlayingChange, style = {} }) {
   const [songIndex, setSongIndex] = useState(0);
   const [playing, setPlaying] = useState(false);
   const audioRef = useRef(null);
@@ -84,6 +84,7 @@ export function MediaPlayer({ model, color, onPlayingChange }) {
       borderRadius: 8,
       padding: "10px 14px",
       backdropFilter: "blur(12px)",
+      ...style,
     }}>
       <audio ref={audioRef} onEnded={skip} />
 

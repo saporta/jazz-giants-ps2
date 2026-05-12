@@ -25,7 +25,7 @@ function LogoModel() {
   );
 }
 
-export function LogoViewer() {
+export function LogoViewer({ containerStyle = {} }) {
   return (
     <div style={{
       position: "absolute",
@@ -35,6 +35,7 @@ export function LogoViewer() {
       height: 100,
       zIndex: 20,
       pointerEvents: "none",
+      ...containerStyle,
     }}>
       <Canvas camera={{ position: [0, 0, 1.5], fov: 45 }} gl={{ alpha: true, antialias: true }}>
         <ambientLight intensity={20} />
