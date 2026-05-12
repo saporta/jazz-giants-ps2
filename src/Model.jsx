@@ -1,11 +1,11 @@
 import { clone } from "three/examples/jsm/utils/SkeletonUtils";
 import { useFrame, useThree } from "@react-three/fiber";
-import { useRef, useEffect } from "react";
+import { useRef, useEffect, useMemo } from "react";
 import { useGLTF } from "@react-three/drei";
 
 export function Model({ path }) {
   const { scene } = useGLTF(path);
-  const clonedScene = clone(scene);
+  const clonedScene = useMemo(() => clone(scene), [scene]);
   const ref = useRef();
   useFrame((_, delta) => {
     if (ref.current) ref.current.rotation.y += delta * 0.4;
